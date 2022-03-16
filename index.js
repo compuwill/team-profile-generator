@@ -30,7 +30,7 @@ if (fs.existsSync('./dist/team.json')) {
             })
 
 
-            console.log('💾 Loaded existing team!')
+            console.log('Loaded existing team!')
 
             PromptWhatToDo();
         }
@@ -50,7 +50,7 @@ var PromptWhatToDo = function () {
     console.log(`|| Total Team Members ${team.length} ||`);
     console.log(`----------------------------------------`);
     team.forEach(object => {
-        console.log(`${object.getRole()}: ${object.getName()} ID: ${object.getId()}`);
+        console.log(`${object.getRole()}: ${object.getName()}`);
     })
     console.log(`----------------------------------------`);
 

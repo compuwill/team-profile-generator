@@ -18,5 +18,11 @@
   "bugs": {
     "url": "https://github.com/compuwill/team-profile-generator/issues"
   },
-  "homepage": "https://github.com/compuwill/team-profile-generator#readme"
+  "homepage": "https://github.com/compuwill/team-profile-generator#readme",
+  "dependencies": {
+    "inquirer": "^8.2.1"
+  },
+  "devDependencies": {
+    "jest": "^27.5.1"
+  }
 }

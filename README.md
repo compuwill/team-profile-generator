@@ -3,6 +3,7 @@
 ## Description
 
 A Node application that automatically generates a webpage that displays a team's basic information.
+
 ![image](https://user-images.githubusercontent.com/22924230/158520293-f981ce42-1803-40ff-b68a-3f2e0d8b4f52.png)
 
 

@@ -21,7 +21,8 @@ To install, simply clone the repository.
 
 ## Usage
 
-Inside of a bash terminal run the index.js file to begin. See the following video for complete usage:
+Inside of a bash terminal run the index.js file to begin. See the following video link for complete usage:
+https://streamable.com/4uhhqa
 
 ## Tests
 

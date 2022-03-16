@@ -166,9 +166,12 @@ var AddTeamMember = function (employee) {
         }
     });
 
-    team.push(employee);
-    SaveTeam();
-    console.log(`${employee.getRole()} '${employee.name}' has been added!`);
+    if(fail == false)
+    {
+        team.push(employee);
+        SaveTeam();
+        console.log(`${employee.getRole()} '${employee.name}' has been added!`);
+    }
     PromptWhatToDo();
 }
 
@@ -188,7 +191,7 @@ var DeleteTeamMember = function () {
 
             team.forEach(member => {
                 if (member.getId() === empDetails[0])
-                    console.log(`Employee '${empDetails[1]}' has been deleted.`);
+                    console.log(`❌ Employee '${member.name}' has been deleted.`);
                 else
                     newTeam.push(member);
             })

@@ -1,18 +1,38 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
 
-const Intern = require('lib/Intern')
-const Engineer = require('lib/Engineer')
-const Manager = require('lib/Manager')
+const Intern = require('./lib/Intern')
+const Engineer = require('./lib/Engineer')
+const Manager = require('./lib/Manager')
 
 
 var team = [];
 
 //load an existing team if there is
-if (fs.existsSync('dist/team.json')) {
-    fs.readFile('dist/team.json', (err, data) => {
+if (fs.existsSync('./dist/team.json')) {
+    fs.readFile('./dist/team.json', (err, data) => {
         if (!err) {
-            team = JSON.parse(data);
+            var jsonTeam = JSON.parse(data);
+            //convert each json employee into a true node object
+            jsonTeam.forEach(employee => {
+                if (employee.role == 'Intern') {
+                    var newIntern = new Intern(employee.name, employee.id, employee.email, employee.school);
+                    team.push(newIntern);
+                }
+                if (employee.role == 'Engineer') {
+                    var newEngineer = new Engineer(employee.name, employee.id, employee.email, employee.github);
+                    team.push(newEngineer);
+                }
+                if (employee.role == 'Manager') {
+                    var newManager = new Manager(employee.name, employee.id, employee.email, employee.officeNumber);
+                    team.push(newManager);
+                }
+            })
+
+
+            console.log('💾 Loaded existing team!')
+
+            PromptWhatToDo();
         }
         else {
             console.log(err);
@@ -20,88 +40,169 @@ if (fs.existsSync('dist/team.json')) {
 
     })
 }
+else {
+    //no existing team
+    PromptWhatToDo();
+}
+
+var PromptWhatToDo = function () {
+    //print the current number of team members and their roles and names
+    console.log(`|| Total Team Members ${team.length} ||`);
+    console.log(`----------------------------------------`);
+    team.forEach(object => {
+        console.log(`${object.getRole()}: ${object.getName()} ID: ${object.getId()}`);
+    })
+    console.log(`----------------------------------------`);
 
 
-//print the current number of team
-console.log(`Total Team Members ${team.length}`);
+    //prompt what to do
+    inquirer.prompt({
+        type: 'list',
+        name: 'option',
+        message: 'What would you like to do?',
+        choices: ['➕ Add a new Team Member', '➖ Delete a Team Member', '✅ Generate the Team Page', '❌ Quit']
 
-//prompt to add a new employee
-inquirer.prompt({
-    type: 'confirm',
-    name: 'add',
-    message: 'Would you like to add a new employee?'
-})
-    .then(({ add }) => {
-        if (add) {
-            AddNewEmployee();
-        }
-    });
+    })
+        .then(({ option }) => {
+            if (option === '➕ Add a new Team Member') {
+                AddNewEmployee();
+            }
+            if (option === '➖ Delete a Team Member') {
+                DeleteTeamMember();
+            }
+            if (option === '✅ Generate the Team Page') {
+                GenerateHTMLPage();
+            }
+        });
+
+
+}
 
 
 var AddNewEmployee = function () {
 
-    inquirer.prompt([
-        {
-            type: 'input',
-            name: 'name',
-            message: 'What is the Employee\'s name?'
-        },
-        {
-            type: 'input',
-            name: 'id',
-            message: 'What is the Employee\'s ID?'
-        },
-        {
-            type: 'input',
-            name: 'email',
-            message: 'What is the Employee\'s Email?'
-        },
-        {
-            type: 'list',
-            name: 'role',
-            message: 'What kind of role is this position?',
-            choices: ['Intern', 'Engineer', 'Manager']
-        }
-    ])
-        .then((data) => {
-            if (data.role === 'Intern') {
-                AddNewIntern(data);
-            }
-            if (data.role === 'Engineer') {
-                AddNewEngineer(data);
-            }
-            if (data.role === 'Manager') {
-                AddNewManager(data);
-            }
-        });
+    //set default questions
+    var questions =
+        [
+            {
+                type: 'input',
+                name: 'name',
+                message: 'What is the Team Member\'s name?'
+            },
+            {
+                type: 'input',
+                name: 'id',
+                message: 'What is the Team Member\'s ID?'
+            },
+            {
+                type: 'input',
+                name: 'email',
+                message: 'What is the Team Member\'s Email?'
+            },
+        ];
 
-}
 
-var AddNewIntern = function (data) {
-    //promt to add a new employee
     inquirer.prompt({
-        type: 'input',
-        name: 'school',
-        message: 'What school is this intern from?'
+        type: 'list',
+        name: 'role',
+        message: 'What kind of role is this Team Member in?',
+        choices: ['Intern', 'Engineer', 'Manager']
     })
-        .then(({ school }) => {
-            if (school) {
-                const newIntern = new Intern(data.name, data.id, data.email, school)
-                team.push(newIntern);
-                SaveTeam();
+        .then(({ role }) => {
+
+            if (role === 'Intern') {
+                questions.push({
+                    type: 'input',
+                    name: 'school',
+                    message: 'What school is this intern from?'
+                })
             }
+            if (role === 'Engineer') {
+                questions.push({
+                    type: 'input',
+                    name: 'github',
+                    message: 'What is this engineer\'s github username?'
+                })
+            }
+            if (role === 'Manager') {
+                questions.push({
+                    type: 'input',
+                    name: 'officeNumber',
+                    message: 'What is this manager\'s office number?'
+                })
+            }
+
+            //ask the questions
+            inquirer.prompt(questions)
+                .then((data) => {
+                    if (data.school) { //if an intern
+                        const newIntern = new Intern(data.name, data.id, data.email, data.school)
+                        AddTeamMember(newIntern);
+                    }
+                    if (data.github) { //if an engineer
+                        const newEngineer = new Engineer(data.name, data.id, data.email, data.github)
+                        AddTeamMember(newEngineer);
+                    }
+                    if (data.officeNumber) { //if a manager
+                        const newManager = new Manager(data.name, data.id, data.email, data.officeNumber)
+                        AddTeamMember(newManager);
+                    }
+                });
+
+        });
+
+}
+
+var AddTeamMember = function (employee) {
+    //check if the id exists already
+    var fail = false;
+    team.forEach(existingTeamMember => {
+        if (existingTeamMember.getId() === employee.getId()) {
+            console.log('Hey! That ID already exists!');
+            console.log('❌ Cancelled!');
+            PromptWhatToDo();
+            fail = true;
+            return;
+        }
+    });
+
+    team.push(employee);
+    SaveTeam();
+    console.log(`${employee.getRole()} '${employee.name}' has been added!`);
+    PromptWhatToDo();
+}
+
+var DeleteTeamMember = function () {
+    //delete which team member?
+    inquirer.prompt({
+        type: 'list',
+        message: 'Which team member would you like to delete?',
+        name: 'delEmp',
+        choices: team.map((employee) => `${employee.getId()}: ${employee.name}`)
+    })
+        .then(({ delEmp }) => {
+            const empDetails = delEmp.split(': ');
+
+
+            var newTeam = [];
+
+            team.forEach(member => {
+                if (member.getId() === empDetails[0])
+                    console.log(`Employee '${empDetails[1]}' has been deleted.`);
+                else
+                    newTeam.push(member);
+            })
+            team = newTeam;
+            SaveTeam();
+            PromptWhatToDo();
         });
 }
 
-var AddNewEngineer = function (data) {
-
-}
-
-var AddNewManager = function (data) {
-
+var SaveTeam = function () {
+    fs.writeFileSync('dist/team.json', JSON.stringify(team, null, '\t'));
 }
 
 
-var SaveTeam = function() {
-    fs.writeFileSync('dist/team.json', JSON.stringify(team));
+var GenerateHTMLPage = function () {
+
 }

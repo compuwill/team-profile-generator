@@ -158,9 +158,16 @@ var AddTeamMember = function (employee) {
     var fail = false;
     team.forEach(existingTeamMember => {
         if (existingTeamMember.getId() === employee.getId()) {
-            console.log('Hey! That ID already exists!');
-            console.log('❌ Cancelled!');
-            PromptWhatToDo();
+            console.log('❌ Hey! That ID already exists!');            
+            inquirer.prompt({
+                type: 'input',
+                name: 'newid',
+                message: 'Enter in a different Team Member ID.'
+            }).then(({ newid }) => {
+                employee.id = newid;
+                AddTeamMember(employee);
+            })
+            
             fail = true;
             return;
         }
@@ -171,8 +178,8 @@ var AddTeamMember = function (employee) {
         team.push(employee);
         SaveTeam();
         console.log(`${employee.getRole()} '${employee.name}' has been added!`);
+        PromptWhatToDo();
     }
-    PromptWhatToDo();
 }
 
 var DeleteTeamMember = function () {
@@ -185,8 +192,6 @@ var DeleteTeamMember = function () {
     })
         .then(({ delEmp }) => {
             const empDetails = delEmp.split(': ');
-
-
             var newTeam = [];
 
             team.forEach(member => {

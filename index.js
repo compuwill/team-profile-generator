@@ -199,10 +199,22 @@ var DeleteTeamMember = function () {
 }
 
 var SaveTeam = function () {
+    //sort the team members
+    team.sort((a, b) => (a.role > b.role) ? 1 : -1);
     fs.writeFileSync('dist/team.json', JSON.stringify(team, null, '\t'));
+
 }
 
 
 var GenerateHTMLPage = function () {
+    //output the json file again
+    SaveTeam();
 
+    //copy out the html src
+    fs.copyFileSync('./src/index.html','./dist/index.html');
+
+    //copy out the script src
+    fs.copyFileSync('./src/script.js','./dist/script.js');
+
+    console.log('✅ Your page has been generated! Please visit the index.html inside the /dist/ folder!');
 }

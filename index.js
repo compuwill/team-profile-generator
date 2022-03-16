@@ -8,43 +8,6 @@ const Manager = require('./lib/Manager')
 
 var team = [];
 
-//load an existing team if there is
-if (fs.existsSync('./dist/team.json')) {
-    fs.readFile('./dist/team.json', (err, data) => {
-        if (!err) {
-            var jsonTeam = JSON.parse(data);
-            //convert each json employee into a true node object
-            jsonTeam.forEach(employee => {
-                if (employee.role == 'Intern') {
-                    var newIntern = new Intern(employee.name, employee.id, employee.email, employee.school);
-                    team.push(newIntern);
-                }
-                if (employee.role == 'Engineer') {
-                    var newEngineer = new Engineer(employee.name, employee.id, employee.email, employee.github);
-                    team.push(newEngineer);
-                }
-                if (employee.role == 'Manager') {
-                    var newManager = new Manager(employee.name, employee.id, employee.email, employee.officeNumber);
-                    team.push(newManager);
-                }
-            })
-
-
-            console.log('Loaded existing team!')
-
-            PromptWhatToDo();
-        }
-        else {
-            console.log(err);
-        }
-
-    })
-}
-else {
-    //no existing team
-    PromptWhatToDo();
-}
-
 var PromptWhatToDo = function () {
     //print the current number of team members and their roles and names
     console.log(`|| Total Team Members ${team.length} ||`);
@@ -225,4 +188,43 @@ var GenerateHTMLPage = function () {
     fs.copyFileSync('./src/script.js','./dist/script.js');
 
     console.log('✅ Your page has been generated! Please visit the index.html inside the /dist/ folder!');
+}
+
+
+
+//load an existing team if there is one
+if (fs.existsSync('./dist/team.json')) {
+    fs.readFile('./dist/team.json', (err, data) => {
+        if (!err) {
+            var jsonTeam = JSON.parse(data);
+            //convert each json employee into a true node object
+            jsonTeam.forEach(employee => {
+                if (employee.role == 'Intern') {
+                    var newIntern = new Intern(employee.name, employee.id, employee.email, employee.school);
+                    team.push(newIntern);
+                }
+                if (employee.role == 'Engineer') {
+                    var newEngineer = new Engineer(employee.name, employee.id, employee.email, employee.github);
+                    team.push(newEngineer);
+                }
+                if (employee.role == 'Manager') {
+                    var newManager = new Manager(employee.name, employee.id, employee.email, employee.officeNumber);
+                    team.push(newManager);
+                }
+            })
+
+
+            console.log('Loaded existing team!')
+
+            PromptWhatToDo();
+        }
+        else {
+            console.log(err);
+        }
+
+    })
+}
+else {
+    //no existing team
+    PromptWhatToDo();
 }
